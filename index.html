@@ -12,9 +12,28 @@
 
   <!--Adding the modules needed for a full screen map app -->
   <script>  
-    require(["esri/config", "esri/Map", "esri/views/MapView", "esri/widgets/BasemapGallery", "esri/widgets/Locate", "esri/widgets/Search"], function(esriConfig, Map, MapView, BasemapGallery, Locate, Search) {   
+    require([
+      "esri/config", 
+      "esri/Map", 
+      "esri/views/MapView", 
+      "esri/widgets/BasemapGallery", 
+      "esri/widgets/Locate", 
+      "esri/widgets/Search",
+      "esri/Graphic",
+      "esri/layers/GraphicsLayer"
+    
+    ], function(
+        esriConfig, 
+        Map, 
+        MapView, 
+        BasemapGallery, 
+        Locate, 
+        Search,
+        Graphic,
+        GraphicsLayer) {   
 
       esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurI4HYBmeR5gYg12zbsYuwSLcu8lOjEkj3KvlVR0A9Uqz_fjUEqKuTKpoR-g9bIyepTx-Ma3n3FdBbCemC09nIev9QHtp12VzBSAoPqqN_TDa_kMGuu0EVCpnFNUlKOV2MupBIW1bpt2Sdc9TdAXx0mPsT25baohTpTtLbaZ5FrrMqaoSCi-mskdNZ_JSceFBOgJD5v_Je9Z6JWjyyH0tSu0jh0SDn_8xBpJyESombDN0AT1_qVLtLC6s"
+      
       const map = new Map({ 
         basemap: "streets" // Basemap layer service 
       });
@@ -54,8 +73,54 @@
         index: 2
       });
 
+      const graphicsLayer = new GraphicsLayer();  
+      map.add(graphicsLayer);
+
+      const point = { // Create a point  
+        type: "point",  
+        longitude: -157.886996452, // Longitude of Tripler Army Medical Center
+        latitude: 21.357165238 // Latitude of Tripler Army Medical Center
+      };
+
+      // Larger underneath cross works as an outline
+      const outlineCrossSymbol = {  
+        type: "simple-marker",  
+        //color: [255, 255, 255], //white outline
+        style: "cross",
+        size: 10,
+        outline: {
+          color: [255, 255, 255],
+          width: 5
+        }
+      };
+
+      // Smaller cross for interior color
+      const filledCrossSymbol = {  
+        type: "simple-marker",  
+        //color: [108, 160, 220],
+        style: "cross", // Cross shape
+        size: 10, // Slightly larger to create the outline effect
+        outline: {
+          color: [200, 0, 0],
+          width: 3
+        }
+      };
+
+      const outlineCrossGraphic = new Graphic({  
+        geometry: point,  
+        symbol: outlineCrossSymbol  
+      });
+
+      const filledCrossGraphic = new Graphic({
+        geometry: point,
+        symbol: filledCrossSymbol
+      })
+
+      // Add both graphics to the graphicsLayer
+      graphicsLayer.add(outlineCrossGraphic);
+      graphicsLayer.add(filledCrossGraphic);
     });  
-   </script>
+  </script>
 
   <style>  
     html,  
