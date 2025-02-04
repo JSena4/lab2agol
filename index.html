@@ -20,7 +20,11 @@
       "esri/widgets/Locate", 
       "esri/widgets/Search",
       "esri/Graphic",
-      "esri/layers/GraphicsLayer"
+      "esri/layers/GraphicsLayer",
+      "esri/PopupTemplate",
+      "esri/geometry/Polyline",
+      "esri/geometry/Polygon",
+      "esri/layers/FeatureLayer"
     
     ], function(
         esriConfig, 
@@ -30,18 +34,23 @@
         Locate, 
         Search,
         Graphic,
-        GraphicsLayer) {   
-
+        GraphicsLayer,
+        PopupTemplate,
+        Polyline,
+        Polygon,
+        FeatureLayer) 
+        
+    {
       esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurI4HYBmeR5gYg12zbsYuwSLcu8lOjEkj3KvlVR0A9Uqz_fjUEqKuTKpoR-g9bIyepTx-Ma3n3FdBbCemC09nIev9QHtp12VzBSAoPqqN_TDa_kMGuu0EVCpnFNUlKOV2MupBIW1bpt2Sdc9TdAXx0mPsT25baohTpTtLbaZ5FrrMqaoSCi-mskdNZ_JSceFBOgJD5v_Je9Z6JWjyyH0tSu0jh0SDn_8xBpJyESombDN0AT1_qVLtLC6s"
       
       const map = new Map({ 
-        basemap: "streets" // Basemap layer service 
+        basemap: "arcgis-topographic" // Basemap layer service 
       });
 
       const view = new MapView({
         map: map,
         center: [-157.00, 20.5], // Longitude, latitude
-        zoom: 7, // Zoom level
+        zoom: 8, // Zoom level
         container: "viewDiv" // Div element
       });
 
@@ -78,8 +87,8 @@
 
       const point = { // Create a point  
         type: "point",  
-        longitude: -157.886996452, // Longitude of Tripler Army Medical Center
-        latitude: 21.357165238 // Latitude of Tripler Army Medical Center
+        longitude: -157.889996452, // Longitude of Tripler Army Medical Center
+        latitude: 21.359995238 // Latitude of Tripler Army Medical Center
       };
 
       // Larger underneath cross works as an outline
@@ -106,11 +115,27 @@
         }
       };
 
+          //defining popup properties
+      const popupTemplate = {
+        title: "{Name}",
+        content: "{Description}"
+      }
+
+      const attributes = {
+        Name: "Tripler Army Medical Center",
+        Description: "The hospital where I was born"     
+      }
+
+      //Creating the underneath cross point to function as the "outline"
       const outlineCrossGraphic = new Graphic({  
         geometry: point,  
-        symbol: outlineCrossSymbol  
+        symbol: outlineCrossSymbol,
+
+        attributes: attributes,
+        popupTemplate: popupTemplate
       });
 
+      //Creating the top layer cross to function as the "fill"
       const filledCrossGraphic = new Graphic({
         geometry: point,
         symbol: filledCrossSymbol
@@ -119,7 +144,66 @@
       // Add both graphics to the graphicsLayer
       graphicsLayer.add(outlineCrossGraphic);
       graphicsLayer.add(filledCrossGraphic);
-    });  
+
+      const polyline = {
+        type: "polyline",
+        paths: [[-157.8899, 21.35999], [-167.8899, 21.35999], [-177.8899, 21.35999]]
+      };
+
+      const lineSymbol = {
+        type: "simple-line",
+        color: [226, 119, 40],
+        width: 4
+      };
+
+      const lineAtt = {
+        Name: "THIS LINE IS NONSENSE!",
+        Owner: "JuStIn SeNa",
+        Length: "zillion million"
+      };
+
+      const polylineGraphic = new Graphic({
+        geometry: polyline,
+        symbol: lineSymbol,
+        attributes: lineAtt,
+        popupTemplate: {
+          title: "{Name}",
+          content: [{
+              type: "fields",
+              fieldInfos: [
+                {fieldName: "name"},
+                {fieldName: "Owner"},
+                {fieldName: "Length"}
+              ]
+          }]
+        }
+      });
+
+      graphicsLayer.add(polylineGraphic);
+
+// Define a pop-up for usaeduLayer
+const popupEduusa = {
+  "title": "EDUs",
+  "content": "<b>Name:</b> {INSTNM}<br><b>Institution Size:</b> {INSTSIZE}<br>"
+}
+
+//adding the Const for the feature layer
+const usaeduLayer = new FeatureLayer({
+url: "https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Colleges_and_Universities_View/FeatureServer",
+
+//adding the popup here
+outFields: ["INSTNM","INSTSIZE"],
+popupTemplate: popupEduusa
+ });
+
+//adding the feature layer to the map
+map.add(usaeduLayer);
+      
+
+
+    });
+
+
   </script>
 
   <style>  
