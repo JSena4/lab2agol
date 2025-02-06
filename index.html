@@ -28,7 +28,9 @@
       "esri/widgets/Expand",
       "esri/Basemap",
       "esri/layers/TileLayer",
-      "esri/layers/VectorTileLayer"
+      "esri/layers/VectorTileLayer",
+      "esri/symbols/PictureMarkerSymbol",
+      "esri/renderers/SimpleRenderer"
     
     ], function(
         esriConfig, 
@@ -46,7 +48,9 @@
         Expand,
         Basemap,
         TileLayer,
-        VectorTileLayer) 
+        VectorTileLayer,
+        PictureMarkerSymbol,
+      SimpleRenderer) 
         
     {
       esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurI4HYBmeR5gYg12zbsYuwSLcu8lOjEkj3KvlVR0A9Uqz_fjUEqKuTKpoR-g9bIyepTx-Ma3n3FdBbCemC09nIev9QHtp12VzBSAoPqqN_TDa_kMGuu0EVCpnFNUlKOV2MupBIW1bpt2Sdc9TdAXx0mPsT25baohTpTtLbaZ5FrrMqaoSCi-mskdNZ_JSceFBOgJD5v_Je9Z6JWjyyH0tSu0jh0SDn_8xBpJyESombDN0AT1_qVLtLC6s"
@@ -296,25 +300,57 @@
 
       graphicsLayer.add(polylineGraphic);
 
-// Define a pop-up for usaeduLayer
-const popupEduusa = {
-  "title": "EDUs",
-  "content": "<b>Name:</b> {INSTNM}<br><b>Institution Size:</b> {INSTSIZE}<br>"
-}
+      // Define a pop-up for usaeduLayer
+      const popupEduusa = {
+        "title": "EDUs",
+        "content": "<b>Name:</b> {INSTNM}<br><b>Institution Size:</b> {INSTSIZE}<br>"
+      }
 
-//adding the Const for the feature layer
-const usaeduLayer = new FeatureLayer({
-url: "https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Colleges_and_Universities_View/FeatureServer",
+      //adding the Const for the schools feature layer
+      const usaeduLayer = new FeatureLayer({
+      url: "https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Colleges_and_Universities_View/FeatureServer",
 
-//adding the popup here
-outFields: ["INSTNM","INSTSIZE"],
-popupTemplate: popupEduusa
- });
+      //adding the schools popup
+      outFields: ["INSTNM","INSTSIZE"],
+      popupTemplate: popupEduusa
+      });
 
-//adding the feature layer to the map
-map.add(usaeduLayer);
-      
+      //adding the feature layer to the map
+      map.add(usaeduLayer);
 
+      //Adding the airport layer  
+
+      // Define a pop-up for usaeduLayer
+      const popupAirportLayer = {
+        "title": "Airports",
+        "content": "<b>Facility Name:</b> {Fac_Name}<br><b>Facility Type:</b> {Fac_Type}<br>"
+      }
+
+
+      /*
+      adding airport icon renderer
+      */
+
+      const airportRenderer = {
+        "type": "simple",
+        "symbol": {
+          "type": "picture-marker",
+          "url": "https://jsena4.github.io/lab2agol/local_airport_24dp_5F6368.png",
+          "width": "18px",
+          "height": "18px"
+        }
+      }
+
+      const airportLayer = new FeatureLayer({
+      url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/US_Airports_SenaJustin/FeatureServer",
+      renderer: airportRenderer,
+
+      //adding the popup here
+      outFields: ["Fac_Type","Fac_Name"],
+      popupTemplate: popupAirportLayer
+      });
+
+      map.add(airportLayer);
 
     });
 
