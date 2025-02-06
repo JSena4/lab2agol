@@ -53,7 +53,7 @@
       SimpleRenderer) 
         
     {
-      esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurEyZXPNJfJ1fGvqr_JmmmCs914eZd0NqvVoeUNHzi7UZU7V8xbldHhuYQ26NmA3ALSUbc9AyiL39RQuCJVpfdYQBqkZiKQnugxqPmWnHDFZeJ8WJ8L9UHaLCw6u0Jsfslpc_DJz0B8YbeLIV6aYKOYJ3HmmGZlMitoBplUGlbAr1glgISLN8KQSz1p9xWJwJUhYiBhd6Xtgu3c3z3aoKQYYUZqd1JklZhEWU6-8UreIJAT1_oP2cXSnd";
+      esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurI4HYBmeR5gYg12zbsYuwSLcu8lOjEkj3KvlVR0A9Uqz_fjUEqKuTKpoR-g9bIyepTx-Ma3n3FdBbCemC09nIev9QHtp12VzBSAoPqqN_TDa_kMGuu0EVCpnFNUlKOV2MupBIW1bpt2Sdc9TdAXx0mPsT25baohTpTtLbaZ5FrrMqaoSCi-mskdNZ_JSceFBOgJD5v_Je9Z6JWjyyH0tSu0jh0SDn_8xBpJyESombDN0AT1_qVLtLC6s"
       
       const map = new Map({ 
         basemap: "arcgis-topographic" // Basemap layer service 
@@ -320,60 +320,87 @@
 
       //Adding the airport layer  
 
-      // Define a pop-up for usaeduLayer
-      const popupAirportLayer = {
-        "title": "Airports",
-        "content": "<b>Facility Name:</b> {Fac_Name}<br><b>Facility Type:</b> {Fac_Type}<br>"
-      }
+// Define a pop-up for airport Layer
+const popupAirportLayer = {
+  "title": "Airports",
+  "content": "<b>Facility Name:</b> {Fac_Name}<br><b>Facility Type:</b> {Fac_Type}<br>"
+};
 
+// Define a pop-up for heliportLayer
+const popupHeliportLayer = {
+  "title": "Heliports",
+  "content": "<b>Facility Name:</b> {Fac_Name}<br><b>Facility Type:</b> {Fac_Type}<br>"
+};
 
-      /*
-      adding airport icon renderer
-      */
+/*
+Adding airport icon renderer
+*/
+const airportRenderer = {
+  "type": "simple",
+  "symbol": {
+    "type": "picture-marker",
+    "url": "https://jsena4.github.io/lab2agol/local_airport_24dp_5F6368.png",
+    "width": "18px",
+    "height": "18px"
+  }
+};
 
-      const airportRenderer = {
-        "type": "simple",
-        "symbol": {
-          "type": "picture-marker",
-          "url": "https://jsena4.github.io/lab2agol/local_airport_24dp_5F6368.png",
-          "width": "18px",
-          "height": "18px"
-        }
-      };
+/*
+Adding heliport icon renderer
+*/
+const heliportRenderer = {
+  "type": "simple",
+  "symbol": {
+    "type": "picture-marker",
+    "url": "https://jsena4.github.io/lab2agol/helipad.png",
+    "width": "18px",
+    "height": "18px"
+  }
+};
 
-      //const to make the airport labels
-        const airportLabels = {
-          symbol: {
-            type: "text",
-            color: "#FFFFFF",
-            haloColor: "#5E8D74",
-            haloSize: "2px",
-            font: {
-              size: "12px",
-              family: "Noto Sans",
-              style: "italic",
-              weight: "normal"
-            }
-          },
-          labelPlacement: "above-center",
-          labelExpressionInfo: {
-            expression: "$feature.Fac_Name"
-          }
-        };
+// Define labels for both airports and heliports
+const facilityLabels = {
+  symbol: {
+    type: "text",
+    color: "#FFFFFF",
+    haloColor: "#5E8D74",
+    haloSize: "2px",
+    font: {
+      size: "12px",
+      family: "Noto Sans",
+      style: "italic",
+      weight: "normal"
+    }
+  },
+  labelPlacement: "above-center",
+  labelExpressionInfo: {
+    expression: "$feature.Fac_Name"
+  }
+};
 
-      const airportLayer = new FeatureLayer({
-      url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/US_Airports_SenaJustin/FeatureServer",
-      renderer: airportRenderer,
+// Create the airport layer
+const airportLayer = new FeatureLayer({
+  url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/US_Airports_SenaJustin/FeatureServer",
+  renderer: airportRenderer,
+  definitionExpression: "Fac_Type = 'AIRPORT'", // Filter for airports
+  labelingInfo: [facilityLabels], // Add the labels
+  outFields: ["Fac_Type", "Fac_Name"],
+  popupTemplate: popupAirportLayer
+});
 
-      definitionExpression: "Fac_Type = 'AIRPORT'", //adding sql to filter for airports
-      labelingInfo: [airportLabels], //adding the labels
+// Create the heliport layer
+const heliportLayer = new FeatureLayer({
+  url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/US_Airports_SenaJustin/FeatureServer",
+  renderer: heliportRenderer,
+  definitionExpression: "Fac_Type = 'HELIPORT'", // Filter for heliports
+  labelingInfo: [facilityLabels], // Add the labels
+  outFields: ["Fac_Type", "Fac_Name"],
+  popupTemplate: popupHeliportLayer
+});
 
-      //adding the popup here
-      outFields: ["Fac_Type","Fac_Name"],
-      popupTemplate: popupAirportLayer
-      });
-
-      map.add(airportLayer);
+// Add both layers to the map
+map.add(airportLayer);
+map.add(heliportLayer);
 
     });
 
