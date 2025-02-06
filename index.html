@@ -345,6 +345,8 @@
       url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/US_Airports_SenaJustin/FeatureServer",
       renderer: airportRenderer,
 
+      definitionExpression: "Fac_Type = 'AIRPORT'", //adding sql to filter for airports
+
       //adding the popup here
       outFields: ["Fac_Type","Fac_Name"],
       popupTemplate: popupAirportLayer
